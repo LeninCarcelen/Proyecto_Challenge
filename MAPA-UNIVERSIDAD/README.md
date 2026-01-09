@@ -288,10 +288,6 @@ MAPA-UNIVERSIDAD/
 
 Para problemas o sugerencias, contactar al equipo de desarrollo.
 
-## 📄 Licencia
-
-Proyecto desarrollado para la Universidad PUCE.
-
 ---
 
 **Desarrollado con ❤️ para PUCE**
