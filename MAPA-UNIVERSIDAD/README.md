@@ -24,7 +24,7 @@ Aplicación full-stack para gestionar alertas de limpieza y contenedores en el c
 - Ver todas las alertas y contenedores
 - Acceso total a la plataforma
 
-## 🛠️ Stack Tecnológico
+##  Stack Tecnológico
 
 ### Backend
 - **Node.js** + **Express.js** - Servidor API
@@ -40,7 +40,7 @@ Aplicación full-stack para gestionar alertas de limpieza y contenedores en el c
 - **Axios** - Cliente HTTP
 - **CSS Modules** - Estilos
 
-## 📦 Instalación y Setup
+##  Instalación y Setup
 
 ### Requisitos Previos
 - Node.js (v14 o superior)
@@ -141,7 +141,7 @@ npm start
 
 La aplicación abrirá en: `http://localhost:3000`
 
-## 👥 Cuentas de Prueba
+##  Cuentas de Prueba
 
 | Email | Contraseña | Rol |
 |-------|-----------|-----|
@@ -149,7 +149,7 @@ La aplicación abrirá en: `http://localhost:3000`
 | limpieza@puce.edu.ec | limpieza123 | Limpieza |
 | usuario@puce.edu.ec | usuario123 | Usuario |
 
-## 📱 Cómo Usar
+##  Cómo Usar
 
 ### Para Usuarios
 1. Login con tu cuenta de usuario
@@ -175,7 +175,7 @@ La aplicación abrirá en: `http://localhost:3000`
    - Haz click en el mapa para colocar el contenedor
 4. Ver todas las alertas y contenedores
 
-## 📊 Estructura del Proyecto
+##  Estructura del Proyecto
 
 ```
 MAPA-UNIVERSIDAD/
@@ -228,14 +228,14 @@ MAPA-UNIVERSIDAD/
 └── README.md
 ```
 
-## 🔒 Seguridad
+##  Seguridad
 
 - **JWT Tokens** para autenticación
 - **Bcrypt** para hashear contraseñas
 - **CORS** configurado para el dominio del frontend
 - **Validación** de roles en todas las rutas protegidas
 
-## 🚀 Deployment
+##  Deployment
 
 ### Backend (Heroku/Railway)
 1. Crear variables de entorno en la plataforma
@@ -246,7 +246,7 @@ MAPA-UNIVERSIDAD/
 1. Configurar REACT_APP_API_URL con el URL del backend
 2. Deploy
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 **Error de conexión a PostgreSQL:**
 - Verificar que PostgreSQL está corriendo
@@ -262,7 +262,7 @@ MAPA-UNIVERSIDAD/
 - Reinstalar node_modules: `rm -rf node_modules && npm install`
 - Verificar que el backend está corriendo en puerto 5000
 
-## 📝 API Endpoints
+##  API Endpoints
 
 ### Auth
 - `POST /api/auth/register` - Registro
@@ -290,4 +290,4 @@ Para problemas o sugerencias, contactar al equipo de desarrollo.
 
 ---
 
-**Desarrollado con ❤️ para PUCE**
+**Desarrollado con ❤️ para la PUCE**
