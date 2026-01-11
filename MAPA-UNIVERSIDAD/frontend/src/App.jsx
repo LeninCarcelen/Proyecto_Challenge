@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
+import DashboardLimpieza from './components/DashboardLimpieza';
 import Mapa from './components/Mapa';
 import './App.css';
 
@@ -34,12 +35,12 @@ function App() {
   };
 
   const toggleDashboard = () => {
-    // Solo admins pueden acceder al dashboard
-    if (usuario.rol !== 'admin') {
-      alert('Solo administradores pueden acceder al Dashboard');
-      return;
+    // Admin o limpieza pueden acceder a su dashboard
+    if (usuario.rol === 'admin' || usuario.rol === 'limpieza') {
+      setShowDashboard(!showDashboard);
+    } else {
+      alert('Solo administradores o limpieza pueden acceder al Dashboard');
     }
-    setShowDashboard(!showDashboard);
   };
 
   if (!usuario) {
@@ -49,18 +50,26 @@ function App() {
   return (
     <div className="app-container">
       {showDashboard ? (
-        <Dashboard 
-          usuario={usuario} 
-          onLogout={handleLogout}
-          onVolverMapa={() => setShowDashboard(false)}
-        />
+        usuario.rol === 'admin' ? (
+          <Dashboard 
+            usuario={usuario} 
+            onLogout={handleLogout}
+            onVolverMapa={() => setShowDashboard(false)}
+          />
+        ) : usuario.rol === 'limpieza' ? (
+          <DashboardLimpieza
+            usuario={usuario}
+            onLogout={handleLogout}
+            onVolverMapa={() => setShowDashboard(false)}
+          />
+        ) : null
       ) : (
         <>
           <div className="mapa-container">
             <Mapa usuario={usuario} />
           </div>
           <div className="app-footer">
-            {usuario.rol === 'admin' && (
+            {(usuario.rol === 'admin' || usuario.rol === 'limpieza') && (
               <button onClick={toggleDashboard} className="btn-dashboard">
                 Dashboard
               </button>

@@ -51,10 +51,10 @@ const seed = async () => {
         tipo: 'negro',
         ubicacion: {
           type: 'Point',
-          coordinates: [-78.4938, -0.3597],
+          coordinates: [-78.4937, -0.3596],
         },
         createdBy: admin._id,
-        descripcion: 'Contenedor negro - Residuos comunes, Entrada principal',
+        descripcion: 'Basura común',
         activo: true,
       },
       {
@@ -64,7 +64,7 @@ const seed = async () => {
           coordinates: [-78.4945, -0.3605],
         },
         createdBy: admin._id,
-        descripcion: 'Punto de reciclaje verde - Cafetería',
+        descripcion: 'Punto de reciclaje (todo tipo de basura)',
         activo: true,
       },
       {
@@ -74,7 +74,7 @@ const seed = async () => {
           coordinates: [-78.4925, -0.3590],
         },
         createdBy: admin._id,
-        descripcion: 'Contenedor azul - Plástico, Biblioteca',
+        descripcion: 'Plástico',
         activo: true,
       },
       {
@@ -84,7 +84,7 @@ const seed = async () => {
           coordinates: [-78.4920, -0.3600],
         },
         createdBy: admin._id,
-        descripcion: 'Contenedor rosa - No orgánico',
+        descripcion: 'No orgánico',
         activo: true,
       },
       {

@@ -101,18 +101,19 @@ export const updateUsuario = async (req, res) => {
   try {
     const { id } = req.params;
     const { nombre, email, rol, activo } = req.body;
-
-    const usuario = await User.findByPk(id);
+    const usuario = await User.findById(id);
     if (!usuario) {
       return res.status(404).json({ mensaje: 'Usuario no encontrado' });
     }
-
-    await usuario.update({ nombre, email, rol, activo });
-
+    if (nombre !== undefined) usuario.nombre = nombre;
+    if (email !== undefined) usuario.email = email;
+    if (rol !== undefined) usuario.rol = rol;
+    if (activo !== undefined) usuario.activo = activo;
+    await usuario.save();
     res.json({
       mensaje: 'Usuario actualizado exitosamente',
       usuario: {
-        id: usuario.id,
+        id: usuario._id,
         nombre: usuario.nombre,
         email: usuario.email,
         rol: usuario.rol,
@@ -128,14 +129,11 @@ export const updateUsuario = async (req, res) => {
 export const deleteUsuario = async (req, res) => {
   try {
     const { id } = req.params;
-
-    const usuario = await User.findByPk(id);
+    const usuario = await User.findById(id);
     if (!usuario) {
       return res.status(404).json({ mensaje: 'Usuario no encontrado' });
     }
-
-    await usuario.destroy();
-
+    await User.deleteOne({ _id: id });
     res.json({ mensaje: 'Usuario eliminado exitosamente' });
   } catch (error) {
     console.error('Error al eliminar usuario:', error);

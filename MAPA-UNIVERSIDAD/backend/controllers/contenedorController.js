@@ -10,9 +10,9 @@ export const crearContenedor = async (req, res) => {
       });
     }
 
-    if (!['amarillo', 'azul', 'verde', 'rojo'].includes(tipo)) {
+    if (!['negro', 'verde', 'azul', 'rosa', 'amarillo'].includes(tipo)) {
       return res.status(400).json({ 
-        mensaje: 'tipo debe ser: amarillo, azul, verde o rojo' 
+        mensaje: 'tipo debe ser: negro, verde, azul, rosa o amarillo' 
       });
     }
 
