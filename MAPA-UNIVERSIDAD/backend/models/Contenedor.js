@@ -4,7 +4,7 @@ const contenedorSchema = new mongoose.Schema({
   tipo: {
     type: String,
     enum: ['negro', 'verde', 'azul', 'rosa', 'amarillo'],
-    required: true,
+    required: [true, 'El tipo es obligatorio'],
   },
   ubicacion: {
     type: {
@@ -16,14 +16,23 @@ const contenedorSchema = new mongoose.Schema({
     coordinates: {
       type: [Number], // [longitude, latitude]
       required: true,
+      validate: {
+        validator: function(arr) {
+          return arr.length === 2 && arr.every(coord => typeof coord === 'number');
+        },
+        message: 'Las coordenadas deben ser un arreglo de dos números',
+      },
     },
   },
   createdBy: {
     type: String,
-    required: true,
+    required: [true, 'El campo createdBy es obligatorio'],
+    minlength: [5, 'El createdBy debe tener al menos 5 caracteres'],
   },
   descripcion: {
     type: String,
+    required: [true, 'La descripción es obligatoria'],
+    minlength: [5, 'La descripción debe tener al menos 5 caracteres'],
     default: '',
   },
   activo: {

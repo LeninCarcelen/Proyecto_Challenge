@@ -1,4 +1,5 @@
 import Alerta from '../models/Alerta.js';
+import Auditoria from '../models/Auditoria.js';
 
 export const crearAlerta = async (req, res) => {
   try {
@@ -20,7 +21,14 @@ export const crearAlerta = async (req, res) => {
     });
 
     await nuevaAlerta.save();
-
+    // Auditoría: registro de creación de alerta
+    await Auditoria.create({
+      usuario: userId,
+      operacion: 'CREATE',
+      entidad: 'Alerta',
+      entidadId: nuevaAlerta._id.toString(),
+      detalles: { ubicacion, descripcion },
+    });
     res.status(201).json({
       mensaje: 'Alerta creada exitosamente',
       alerta: nuevaAlerta,
@@ -76,6 +84,14 @@ export const updateAlerta = async (req, res) => {
       return res.status(404).json({ mensaje: 'Alerta no encontrada' });
     }
 
+    // Auditoría: registro de actualización de alerta
+    await Auditoria.create({
+      usuario: alerta.userId,
+      operacion: 'UPDATE',
+      entidad: 'Alerta',
+      entidadId: alerta._id.toString(),
+      detalles: { estado, descripcion },
+    });
     res.json({
       mensaje: 'Alerta actualizada exitosamente',
       alerta,
@@ -96,6 +112,14 @@ export const deleteAlerta = async (req, res) => {
       return res.status(404).json({ mensaje: 'Alerta no encontrada' });
     }
 
+    // Auditoría: registro de eliminación de alerta
+    await Auditoria.create({
+      usuario: alerta.userId,
+      operacion: 'DELETE',
+      entidad: 'Alerta',
+      entidadId: alerta._id.toString(),
+      detalles: {},
+    });
     res.json({ mensaje: 'Alerta eliminada exitosamente' });
   } catch (error) {
     console.error('Error al eliminar alerta:', error);

@@ -1,4 +1,5 @@
 import Contenedor from '../models/Contenedor.js';
+import Auditoria from '../models/Auditoria.js';
 
 export const crearContenedor = async (req, res) => {
   try {
@@ -27,7 +28,14 @@ export const crearContenedor = async (req, res) => {
     });
 
     await nuevoContenedor.save();
-
+    // Auditoría: registro de creación de contenedor
+    await Auditoria.create({
+      usuario: createdBy,
+      operacion: 'CREATE',
+      entidad: 'Contenedor',
+      entidadId: nuevoContenedor._id.toString(),
+      detalles: { tipo, ubicacion, descripcion },
+    });
     res.status(201).json({
       mensaje: 'Contenedor creado exitosamente',
       contenedor: nuevoContenedor,
@@ -84,6 +92,14 @@ export const updateContenedor = async (req, res) => {
       return res.status(404).json({ mensaje: 'Contenedor no encontrado' });
     }
 
+    // Auditoría: registro de actualización de contenedor
+    await Auditoria.create({
+      usuario: contenedor.createdBy,
+      operacion: 'UPDATE',
+      entidad: 'Contenedor',
+      entidadId: contenedor._id.toString(),
+      detalles: { tipo, descripcion, activo },
+    });
     res.json({
       mensaje: 'Contenedor actualizado exitosamente',
       contenedor,
@@ -104,6 +120,14 @@ export const deleteContenedor = async (req, res) => {
       return res.status(404).json({ mensaje: 'Contenedor no encontrado' });
     }
 
+    // Auditoría: registro de eliminación de contenedor
+    await Auditoria.create({
+      usuario: contenedor.createdBy,
+      operacion: 'DELETE',
+      entidad: 'Contenedor',
+      entidadId: contenedor._id.toString(),
+      detalles: {},
+    });
     res.json({ mensaje: 'Contenedor eliminado exitosamente' });
   } catch (error) {
     console.error('Error al eliminar contenedor:', error);
