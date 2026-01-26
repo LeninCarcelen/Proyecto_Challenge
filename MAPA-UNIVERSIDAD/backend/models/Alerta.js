@@ -3,7 +3,8 @@ import mongoose from 'mongoose';
 const alertaSchema = new mongoose.Schema({
   userId: {
     type: String,
-    required: true,
+    required: [true, 'El userId es obligatorio'],
+    minlength: [5, 'El userId debe tener al menos 5 caracteres'],
   },
   ubicacion: {
     type: {
@@ -15,6 +16,12 @@ const alertaSchema = new mongoose.Schema({
     coordinates: {
       type: [Number], // [longitude, latitude]
       required: true,
+      validate: {
+        validator: function(arr) {
+          return arr.length === 2 && arr.every(coord => typeof coord === 'number');
+        },
+        message: 'Las coordenadas deben ser un arreglo de dos números',
+      },
     },
   },
   estado: {
@@ -24,6 +31,8 @@ const alertaSchema = new mongoose.Schema({
   },
   descripcion: {
     type: String,
+    required: [true, 'La descripción es obligatoria'],
+    minlength: [5, 'La descripción debe tener al menos 5 caracteres'],
     default: 'Alerta de limpieza',
   },
   createdAt: {

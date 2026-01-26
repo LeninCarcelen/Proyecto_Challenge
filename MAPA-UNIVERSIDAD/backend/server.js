@@ -5,6 +5,7 @@ import connectMongoDB from './config/mongodb.js';
 import authRoutes from './routes/authRoutes.js';
 import alertaRoutes from './routes/alertaRoutes.js';
 import contenedorRoutes from './routes/contenedorRoutes.js';
+import reporteRoutes from './routes/reporteRoutes.js';
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ const inicializarBaseDatos = async () => {
 app.use('/api/auth', authRoutes);
 app.use('/api/alertas', alertaRoutes);
 app.use('/api/contenedores', contenedorRoutes);
+app.use('/api/reportes', reporteRoutes);
 
 // Ruta de prueba
 app.get('/api/health', (req, res) => {

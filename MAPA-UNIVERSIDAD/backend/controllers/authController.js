@@ -1,4 +1,5 @@
 import User from '../models/UserMongo.js';
+import Auditoria from '../models/Auditoria.js';
 import jwt from 'jsonwebtoken';
 
 const generateToken = (user) => {
@@ -31,6 +32,15 @@ export const register = async (req, res) => {
       rol: rol || 'usuario',
     });
 
+    // Auditoría: registro de creación de usuario
+    await Auditoria.create({
+      usuario: nuevoUsuario.email,
+      operacion: 'CREATE',
+      entidad: 'User',
+      entidadId: nuevoUsuario._id.toString(),
+      detalles: { nombre, email, rol: rol || 'usuario' },
+    });
+
     const token = generateToken(nuevoUsuario);
 
     res.status(201).json({
@@ -59,7 +69,7 @@ export const login = async (req, res) => {
       });
     }
 
-    const usuario = await User.findOne({ email });
+    const usuario = await User.findOne({ email }).select('+password');
     if (!usuario) {
       return res.status(401).json({ mensaje: 'Credenciales inválidas' });
     }
@@ -101,18 +111,27 @@ export const updateUsuario = async (req, res) => {
   try {
     const { id } = req.params;
     const { nombre, email, rol, activo } = req.body;
-
-    const usuario = await User.findByPk(id);
+    const usuario = await User.findById(id);
     if (!usuario) {
       return res.status(404).json({ mensaje: 'Usuario no encontrado' });
     }
-
-    await usuario.update({ nombre, email, rol, activo });
-
+    if (nombre !== undefined) usuario.nombre = nombre;
+    if (email !== undefined) usuario.email = email;
+    if (rol !== undefined) usuario.rol = rol;
+    if (activo !== undefined) usuario.activo = activo;
+    await usuario.save();
+    // Auditoría: registro de actualización de usuario
+    await Auditoria.create({
+      usuario: usuario.email,
+      operacion: 'UPDATE',
+      entidad: 'User',
+      entidadId: usuario._id.toString(),
+      detalles: { nombre, email, rol, activo },
+    });
     res.json({
       mensaje: 'Usuario actualizado exitosamente',
       usuario: {
-        id: usuario.id,
+        id: usuario._id,
         nombre: usuario.nombre,
         email: usuario.email,
         rol: usuario.rol,
@@ -128,14 +147,19 @@ export const updateUsuario = async (req, res) => {
 export const deleteUsuario = async (req, res) => {
   try {
     const { id } = req.params;
-
-    const usuario = await User.findByPk(id);
+    const usuario = await User.findById(id);
     if (!usuario) {
       return res.status(404).json({ mensaje: 'Usuario no encontrado' });
     }
-
-    await usuario.destroy();
-
+    await User.deleteOne({ _id: id });
+    // Auditoría: registro de eliminación de usuario
+    await Auditoria.create({
+      usuario: usuario.email,
+      operacion: 'DELETE',
+      entidad: 'User',
+      entidadId: usuario._id.toString(),
+      detalles: {},
+    });
     res.json({ mensaje: 'Usuario eliminado exitosamente' });
   } catch (error) {
     console.error('Error al eliminar usuario:', error);

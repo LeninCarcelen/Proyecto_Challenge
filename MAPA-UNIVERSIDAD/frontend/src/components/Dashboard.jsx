@@ -83,6 +83,19 @@ const Dashboard = ({ usuario, onLogout, onVolverMapa }) => {
     }
   };
 
+  // Permite al admin actualizar rol o estado activo/inactivo
+  const handleUpdateUser = async (id, data) => {
+    try {
+      setLoading(true);
+      await authService.updateUsuario(id, data);
+      cargarUsuarios();
+    } catch (error) {
+      alert('Error al actualizar usuario');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="dashboard">
       <div className="dashboard-header">
@@ -184,16 +197,35 @@ const Dashboard = ({ usuario, onLogout, onVolverMapa }) => {
                 </thead>
                 <tbody>
                   {usuarios.map((u) => (
-                    <tr key={u.id}>
+                    <tr key={u._id}>
                       <td>{u.nombre}</td>
                       <td>{u.email}</td>
-                      <td>{u.rol}</td>
-                      <td>{u.activo ? 'Activo' : 'Inactivo'}</td>
+                      <td>
+                        <select
+                          value={u.rol}
+                          onChange={e => handleUpdateUser(u._id, { rol: e.target.value })}
+                          disabled={u._id === usuario._id || loading}
+                        >
+                          <option value="usuario">Usuario</option>
+                          <option value="limpieza">Equipo de Limpieza</option>
+                          <option value="admin">Administrador</option>
+                        </select>
+                      </td>
+                      <td>
+                        <select
+                          value={u.activo ? 'activo' : 'inactivo'}
+                          onChange={e => handleUpdateUser(u._id, { activo: e.target.value === 'activo' })}
+                          disabled={u._id === usuario._id || loading}
+                        >
+                          <option value="activo">Activo</option>
+                          <option value="inactivo">Inactivo</option>
+                        </select>
+                      </td>
                       <td>
                         <button
-                          onClick={() => handleDeleteUser(u.id)}
+                          onClick={() => handleDeleteUser(u._id)}
                           className="btn-delete"
-                          disabled={u.id === usuario.id}
+                          disabled={u._id === usuario._id}
                         >
                           Eliminar
                         </button>

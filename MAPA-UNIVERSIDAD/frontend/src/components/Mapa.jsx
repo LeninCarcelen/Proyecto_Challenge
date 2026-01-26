@@ -9,6 +9,7 @@ import {
 } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-rotate';
 import { alertaService, contenedorService } from '../services/api';
 import './Mapa.css';
 
@@ -66,12 +67,15 @@ function ClickContenedor({ enabled, tipo, onAdd }) {
   return null;
 }
 
+
 const Mapa = ({ usuario }) => {
   const mapRef = useRef(null);
   const [contenedores, setContenedores] = useState([]);
   const [alertas, setAlertas] = useState([]);
   const [tipoSeleccionado, setTipoSeleccionado] = useState('');
   const [loading, setLoading] = useState(true);
+  // Para usuarios, seleccionar contenedor para alerta
+  const [contenedorAlerta, setContenedorAlerta] = useState('');
 
   const isAdmin = usuario.rol === 'admin';
   const isLimpieza = usuario.rol === 'limpieza';
@@ -136,12 +140,21 @@ const Mapa = ({ usuario }) => {
       alert('Por favor, marque dentro del área del campus');
       return;
     }
-
+    // El contenedor es opcional
+    const descripcion = window.prompt('Describe el motivo de la alerta:');
+    if (!descripcion || descripcion.trim().length < 3) {
+      alert('Debes ingresar una descripción válida.');
+      return;
+    }
     try {
       const ubicacion = {
         coordinates: [latlng.lng, latlng.lat],
       };
-      await alertaService.crearAlerta(usuario.id, ubicacion, 'Alerta creada por usuario');
+      let descFinal = descripcion;
+      if (contenedorAlerta) {
+        descFinal += ` (Contenedor: ${contenedorAlerta})`;
+      }
+      await alertaService.crearAlerta(usuario.id, ubicacion, descFinal);
       alert('Alerta registrada correctamente');
       cargarAlertas();
     } catch (error) {
@@ -238,6 +251,13 @@ const Mapa = ({ usuario }) => {
     }
   }, []);
 
+
+  useEffect(() => {
+    if (mapRef.current && mapRef.current.setBearing) {
+      mapRef.current.setBearing(-30);
+    }
+  }, [loading]);
+
   if (loading) {
     return <div className="mapa-loading">Cargando mapa...</div>;
   }
@@ -269,6 +289,28 @@ const Mapa = ({ usuario }) => {
         </div>
       )}
 
+      {/* Selector de contenedor para usuarios */}
+      {isUsuario && (
+        <div className="usuario-controls">
+          <label>Selecciona el contenedor relacionado a la alerta:</label>
+          <select
+            value={contenedorAlerta}
+            onChange={e => setContenedorAlerta(e.target.value)}
+            style={{ marginLeft: 8, marginBottom: 16 }}
+          >
+            <option value="">-- Selecciona un contenedor --</option>
+            {contenedores.map(c => (
+              <option key={c._id} value={c.tipo + ' - ' + c.descripcion}>
+                {c.tipo} - {c.descripcion}
+              </option>
+            ))}
+          </select>
+          <p className="info-text">
+            Selecciona el contenedor más cercano o relacionado antes de reportar la alerta.
+          </p>
+        </div>
+      )}
+
       <MapContainer
         ref={mapRef}
         center={centerPUCE}
@@ -279,8 +321,15 @@ const Mapa = ({ usuario }) => {
         scrollWheelZoom={false}
         doubleClickZoom={false}
         maxBounds={campusPolygon}
-        maxBoundsViscosity={1.0}
+        maxBoundsViscosity={6}
+        bearing={30}
+        rotate={true}
+        touchRotate={false}
         style={{ height: '100%', width: '100%' }}
+        whenCreated={map => {
+          mapRef.current = map;
+          if (map.setBearing) map.setBearing(-30);
+        }}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
@@ -312,9 +361,10 @@ const Mapa = ({ usuario }) => {
             icon={iconos[c.tipo]}
           >
             <Popup>
-              <strong>Contenedor {c.tipo}</strong>
-              <br />
-              {c.descripcion}
+              <div style={{marginBottom:4}}>
+                <strong>Contenedor {c.tipo.charAt(0).toUpperCase() + c.tipo.slice(1)}</strong>
+              </div>
+              <div style={{fontWeight:400}}>{c.descripcion}</div>
               {isAdmin && (
                 <>
                   <br />
@@ -323,6 +373,34 @@ const Mapa = ({ usuario }) => {
                     className="btn-eliminar"
                   >
                     Eliminar
+                  </button>
+                </>
+              )}
+              {isUsuario && (
+                <>
+                  <br />
+                  <button
+                    className="btn-primary"
+                    onClick={async () => {
+                      const descripcion = window.prompt('Describe el motivo de la alerta:');
+                      if (!descripcion || descripcion.trim().length < 3) {
+                        alert('Debes ingresar una descripción válida.');
+                        return;
+                      }
+                      try {
+                        const ubicacion = {
+                          coordinates: [c.ubicacion.coordinates[0], c.ubicacion.coordinates[1]],
+                        };
+                        let descFinal = descripcion + ` (Contenedor: ${c.tipo} - ${c.descripcion})`;
+                        await alertaService.crearAlerta(usuario.id, ubicacion, descFinal);
+                        alert('Alerta registrada correctamente');
+                        cargarAlertas();
+                      } catch (error) {
+                        alert('Error al registrar alerta');
+                      }
+                    }}
+                  >
+                    Reportar alerta aquí
                   </button>
                 </>
               )}
